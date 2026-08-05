@@ -1,0 +1,57 @@
+# --- Core ---
+python-dotenv==1.0.1
+# NOTE: pydantic/pydantic-core and tiktoken are Rust (PyO3) extensions; older
+# pinned versions have no Python 3.14 wheel and fail to build without a Rust
+# toolchain, so these are left as lower-bound ranges instead of exact pins.
+pydantic>=2.10
+pydantic-settings>=2.6
+
+# --- Ingestion ---
+requests==2.32.3
+pypdf==4.3.1
+tiktoken>=0.11
+
+# --- Embeddings & Vector Store ---
+sentence-transformers==3.1.1
+chromadb==0.5.15
+# chromadb 0.5.15 declares an unbounded `posthog` dependency; recent posthog
+# releases changed their capture() signature and break chromadb's telemetry
+# calls (harmless errors, but noisy) unless pinned below 3.0.
+posthog<3.0
+
+# --- RAG / LLM Orchestration ---
+langchain==0.3.4
+langchain-community==0.3.3
+langchain-ollama==0.2.0
+langchain-groq==0.2.0
+langchain-openai==0.2.3
+langchain-anthropic==0.2.3
+ollama==0.3.3
+
+# --- Backend ---
+# NOTE: left unpinned on the patch level (not ==0.115.4) because that version
+# caps starlette<0.42, which conflicts with the starlette version streamlit
+# needs; letting pip resolve both together keeps them mutually compatible.
+fastapi>=0.115
+uvicorn[standard]==0.32.0
+
+# --- Frontend ---
+# NOTE: pinned >=1.45 (not 1.39) because streamlit<1.40 caps pillow<11, and no
+# Pillow <11 build ships a Python 3.14 wheel.
+streamlit>=1.45,<2.0
+
+# --- Evaluation ---
+ragas==0.2.3
+nltk>=3.9  # transitive ragas dependency for BleuScore, not auto-installed
+# datasets' fingerprinting uses dill for pickling; dill<0.4.1 hits a TypeError
+# against Python 3.14's changed pickle._Pickler._batch_setitems signature.
+datasets>=3.0
+dill>=0.4.1
+pandas==2.2.3
+# NOTE: 3.9.2 hits infinite recursion in Path.__deepcopy__ under Python 3.14's
+# copy module during fig.tight_layout(); a newer release is required.
+matplotlib>=3.10
+
+# --- Testing ---
+pytest==8.3.3
+httpx==0.27.2
